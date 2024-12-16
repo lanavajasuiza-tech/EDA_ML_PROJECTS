@@ -34,7 +34,7 @@ print("Directorio raíz detectado dinámicamente:", project_root)
 # Ruta simplificada al dataset
 df_path = os.path.join(project_root, "dataSet")
 print(f"Ruta del dataset: {df_path}")
-df = "wholesale.csv"
+df = "train.csv"
 
 #---------------- CARGAR Y PROCESAR LOS DATOS -------------------#
 try:
