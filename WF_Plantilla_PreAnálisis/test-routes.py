@@ -6,7 +6,7 @@ import sys
 import sys
 
 # Ruta del proyecto
-project_root = r"C:\Users\rportatil112\Documents\CURSO-DATA-SCIENCE\MACHINE_LEARNING_E_INTELIGENCIA_ARTIFICIAL\Curso_ML_Laner\17-Modelos\NoSupervisados\WF_ML_kmeans"
+project_root = r"C:\ruta_de_tu_proyecto"
 
 # Añadir solo la ruta si no está presente
 if project_root not in sys.path:
