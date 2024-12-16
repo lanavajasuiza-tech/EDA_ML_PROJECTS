@@ -23,15 +23,18 @@ from utils.processing import DataLoader
 from utils.analyzer import DataAnalyzer
 
 
+#---------------- CARGAR DATASET -------------------#
 
-# Ajustar el directorio raíz para garantizar que los módulos sean accesibles
-sys.path.append(r"C:\Users\rportatil112\Documents\CURSO-DATA-SCIENCE\MACHINE_LEARNING_E_INTELIGENCIA_ARTIFICIAL\Curso_ML_Laner\17-Modelos\NoSupervisados\WF_ML_kmeans")
-print("Directorio actual:", os.getcwd())
+# Detectar dinámicamente el directorio raíz del proyecto
+project_root = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(project_root)
+print("Directorio raíz detectado dinámicamente:", project_root)
 
-# Configuración: Definimos la ruta y nombre del dataSet
-df_path = "dataSet"
+
+# Ruta simplificada al dataset
+df_path = os.path.join(project_root, "dataSet")
+print(f"Ruta del dataset: {df_path}")
 df = "wholesale.csv"
-new_df = "incluir_el_nombre" # En caso de jugar con otro función change_file en processing.py
 
 #---------------- CARGAR Y PROCESAR LOS DATOS -------------------#
 try:
@@ -59,9 +62,30 @@ if df is not None:
     analyzer.data_types_analysis()
     print("Columnas categóricas detectadas:", analyzer.columns_cat)
     print("Columnas numéricas detectadas:", analyzer.columns_num)
-    analyzer.combined_statistics()
-    analyzer.nan_summary()
+    #analyzer.nan_summary()
 else:
     print("\n--- No se pudo cargar el dataset. Análisis abortado ---")
 
 
+    #---------------- VISUALIZAR LOS DATOS -------------------#
+
+from utils.visualization import DataVisualizationCoordinator
+
+print("\n--- Visualización Combinada ---")
+
+# Columnas seleccionadas para las visualizaciones
+x_col = "Grocery"      # Columna para el eje X del scatterplot
+y_col = "Milk"         # Columna para el eje Y del scatterplot
+bar_box_col = "Grocery"  # Columna para el barplot y boxplot
+cluster_col = "Channel"  # Columna de clusters
+
+# Instanciar el coordinador de visualizaciones
+viz_coordinator = DataVisualizationCoordinator(df)
+
+# Generar todas las visualizaciones en una sola ventana
+try:
+    viz_coordinator.plot_all(x=x_col, y=y_col, column=bar_box_col, clusters=cluster_col)
+except KeyError as e:
+    print(f"Error en las visualizaciones: {e}")
+    print("Columnas disponibles en el DataFrame:", df.columns.tolist())
+    

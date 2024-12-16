@@ -11,6 +11,8 @@ class DataAnalyzer:
         self.df = df
         self.columns_num = []
         self.columns_cat = []
+        self.columns_num = df.select_dtypes(include=['number']).columns.tolist() # Outliners def
+        self.columns_cat = df.select_dtypes(include=['object']).columns.tolist() # categorical summary
 
 
     def overview(self):
@@ -20,8 +22,8 @@ class DataAnalyzer:
         """
         print("\n--- Estadísticas descriptivas (transpuesta) ---")
         print(self.df.describe().T)
-        print("\n--- Tipos de datos ---")
-        print(self.df.dtypes)
+       # print("\n--- Tipos de datos ---")
+        #print(self.df.dtypes)
         print("\n--- Títulos de las columnas ---")
         print(self.df.columns.tolist())
         print("\n--- Número de columnas ---")
@@ -74,8 +76,8 @@ class DataAnalyzer:
             ]
         })
         tabla_exploded = table_type.explode(['Column', 'Type']).reset_index(drop=True)
-        print("\n--- Resumen de tipos de columnas ---")
-        print(tabla_exploded)
+        #print("\n--- Resumen de tipos de columnas ---")
+        #print(tabla_exploded)
 
 
     def missing_values_analysis(self):
@@ -103,41 +105,7 @@ class DataAnalyzer:
         print("\n--- Column Type Summary ---")
         print(tabla_exploded)
 
-
-
-    def combined_statistics(self, categorical=None, numerical=None):
-        """
-        Combina estadísticas descriptivas para columnas categóricas y numéricas.
-        
-        :param categorical: Lista de columnas categóricas (opcional).
-        :param numerical: Lista de columnas numéricas (opcional).
-        """
-        # Usar las columnas detectadas automáticamente si no se proporcionan
-        if categorical is None:
-            categorical = self.columns_cat
-        if numerical is None:
-            numerical = self.columns_num
-
-            if not categorical and not numerical:
-                print("\n--- No se encontraron columnas categóricas o numéricas para analizar ---")
-                return
-
-            if categorical:
-                categ_stats = self.df[categorical].describe().T
-                print("\n--- Estadísticas para columnas categóricas ---")
-                print(categ_stats)
-
-            if numerical:
-                num_stats = self.df[numerical].describe().T
-                print("\n--- Estadísticas para columnas numéricas ---")
-                print(num_stats)
-
-            if categorical and numerical:
-                combined_stats = pd.concat([categ_stats, num_stats], axis=0)
-                print("\n--- Estadísticas combinadas ---")
-                print(combined_stats)
-
-        # Nuevo método para calcular el porcentaje de valores NaN
+   # Nuevo método para calcular el porcentaje de valores NaN
     def nan_summary(self):
         """
         Calcula y muestra el porcentaje de valores NaN por columna.
