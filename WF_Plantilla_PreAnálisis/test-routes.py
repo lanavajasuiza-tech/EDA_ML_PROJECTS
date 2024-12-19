@@ -6,7 +6,7 @@ import sys
 import sys
 
 # Ruta del proyecto
-project_root = r"C:\ruta_de_tu_proyecto"
+project_root = r"C:\Users\rportatil112\Documents\EDA_Analysis\WF_Plantilla_PreAnálisis"
 
 # Añadir solo la ruta si no está presente
 if project_root not in sys.path:
