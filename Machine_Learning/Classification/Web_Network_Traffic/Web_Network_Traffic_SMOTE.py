@@ -55,7 +55,7 @@ from imblearn.over_sampling import SMOTE
 # --- 2. CARGA Y EXPLORACIÓN DE DATOS ---
 print("\n--- CARGA Y EXPLORACIÓN ---")
 # Ruta al dataset
-data_path = r"C:\Users\rportatil112\Documents\CURSO-DATA-SCIENCE\EXAMEN"
+data_path = r"C:\Users\rportatil112\Documents\CURSO-DATA-SCIENCE\EXAMEN\dataSet"
 os.chdir(data_path)
 df = pd.read_csv("all_datas_f.csv")
 
@@ -271,16 +271,14 @@ print(pd.Series(y_train_resampled).value_counts())
 
 
 # Exportamos el dataframe ya procesado para trabajar sobre él
-
-export_path = "all_datas_f_SMOTE.csv"  # Ruta donde se guardará el archivo
+export_path = "C:/Users/rportatil112/Documents/CURSO-DATA-SCIENCE/EXAMEN/output/all_datas_f_CLASS_SMOTE.csv"  # Ruta donde se guardará el archivo
 df.to_csv(export_path, index=False)
 print(f"Dataset preprocesado guardado en {export_path}")
 
 
-
 # ---> ENTRENAMIENTO Y EVALUACIÓN
 
-df = pd.read_csv("all_datas_f_SMOTE.csv")
+df = pd.read_csv("C:/Users/rportatil112/Documents/CURSO-DATA-SCIENCE/EXAMEN/output/all_datas_f_CLASS_SMOTE.csv")
 print("Dataset cargado con éxito:")
 print(df.head())
 

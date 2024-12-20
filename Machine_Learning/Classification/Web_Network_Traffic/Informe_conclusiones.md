@@ -122,7 +122,7 @@ Se utilizó la librería `lazypredict` para evaluar modelos adicionales. El **Ex
 
 1. **Random Forest** es la mejor opción por su rendimiento y recall perfecto.
 2. **Naive Bayes** es una alternativa rápida y efectiva.
-3. Este análisis puede ser extendido con más features relevantes o mediante técnicas avanzadas como hyperparameter tuning.
+3. Se prueba tanto con la técnica de SMOTE como con el parámetro class-weight = balance incluido en el modelo para probar diferencias, no se aprecia ninguna reseñablea a nivel de resultados pero sí reduce el código por lo que a nivel de gasto de computación es más eficiente.
 
 ---
 
