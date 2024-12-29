@@ -99,9 +99,7 @@ class DataAnalyzer:
                 [self.df[col].dtype for col in self.columns_cat]
             ]
         })
-        tabla_exploded = table_type.explode(['Columns', 'Dtype']).reset_index(drop=True)
-        print("\n--- Column Type Summary ---")
-        print(tabla_exploded)
+
 
    # Nuevo método para calcular el porcentaje de valores NaN
     def nan_summary(self):
