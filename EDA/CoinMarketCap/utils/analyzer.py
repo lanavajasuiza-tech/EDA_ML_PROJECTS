@@ -55,15 +55,23 @@ class DataAnalyzer:
 
     def data_types_analysis(self):
         """
-        Muestra un resumen de las columnas numéricas y categóricas y las almacena.
+        Muestra un resumen actualizado de las columnas numéricas y categóricas del DataFrame.
         """
+        # Recalcular las columnas categóricas y numéricas
         self.columns_num = self.df.select_dtypes(include=['number']).columns.tolist()
         self.columns_cat = self.df.select_dtypes(exclude=['number']).columns.tolist()
+
+        # Validación de columnas presentes
+        print("\n--- Validación de columnas actuales en el DataFrame ---")
+        print(f"Columnas actuales: {self.df.columns.tolist()}")
+
+        # Mostrar las columnas categóricas y numéricas actualizadas
         print("\n--- Columnas categóricas ---")
         print(self.columns_cat)
         print("\n--- Columnas numéricas ---")
         print(self.columns_num)
 
+        # Crear un resumen de tipos de columnas
         table_type = pd.DataFrame({
             "Column Type": ["Numerical", "Categorical"],
             "Cuantity": [len(self.columns_num), len(self.columns_cat)],
@@ -76,6 +84,21 @@ class DataAnalyzer:
         tabla_exploded = table_type.explode(['Column', 'Type']).reset_index(drop=True)
         print("\n--- Resumen de tipos de columnas ---")
         print(tabla_exploded)
+
+        
+    def update_data(self, new_df):
+        """
+        Actualiza el DataFrame interno de la clase.
+        
+        :param new_df: Nuevo DataFrame a asignar
+        """
+        self.df = new_df
+        # Actualizar las columnas categóricas y numéricas
+        self.columns_num = new_df.select_dtypes(include=['number']).columns.tolist()
+        self.columns_cat = new_df.select_dtypes(exclude=['number']).columns.tolist()
+        print("DataFrame actualizado exitosamente. Nuevas columnas:")
+        print(self.df.columns.tolist())
+
 
 
     def missing_values_analysis(self):
@@ -123,3 +146,4 @@ class DataAnalyzer:
         else:
             print("No se encontraron valores NaN en el dataset.")
         return nan_report
+    

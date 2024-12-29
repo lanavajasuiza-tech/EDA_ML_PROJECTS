@@ -33,9 +33,9 @@ print("Directorio raíz detectado dinámicamente:", project_root)
 # Ruta simplificada al dataset
 df_path = os.path.join(project_root, "dataSet")
 print(f"Ruta del dataset: {df_path}")
-df = "currencies_data_DIC_2024.csv"
+df = "currencies_data_Kaggle_2023_unique.csv"
 
-#---------------- CARGAR Y PROCESAR LOS DATOS -------------------#
+#---------------- CARGAR Y ANALIZAR LOS DATOS -------------------#
 try:
     loader = DataLoader(df_path=df_path, df=df)
     df = loader.load_data()
@@ -62,117 +62,98 @@ if df is not None:
 else:
     print("\n--- No se pudo cargar el dataset. Análisis abortado ---")
 
+#---------------- PROCESAR LOS DATOS -------------------#
 
 '''
-El DataSet es muy grande  vamos a reducirlo siguiendo estos criterios:
-0. Convertir los dato tipo fecha para manejar la información y prepararlo para predicciones temporales.
-1. Volumen de mercado (volume_24h): Las criptomonedas con mayor actividad.
-2. Capitalización de mercado (marketCap): Las criptomonedas más valiosas.
-3. Antigüedad (date_added): Las criptomonedas con más historia.
-4. Ranking (cmc_rank): Seleccionar las criptomonedas mejor posicionadas.'''
+Vamos a tratar las fechas, los NaN: y los valores categóricos
+'''
+
+# Por lo pronto, nos cargamos name.1 que está duplicada
+
+if 'name.1' in df.columns:
+    df.drop(columns=['name.1'], inplace=True)
+    print("Columna 'name.1' eliminada.")
+    analyzer.data_types_analysis()
 
 
-# Filtrar criptomonedas según múltiples criterios
+# Veamos que columnas tienen Nan
+nan_por_columna = df.isnull().sum()
+print(nan_por_columna[nan_por_columna > 0])
+'''La columna maxSupply contiene todos los NaN
+y se debe a que no hay datos así que lo vamos a rellenar con 0'''
 
-from datetime import datetime
+df.fillna(0, inplace=True)
+print(f"Valores NaN restantes: {df.isnull().sum().sum()}") # confirmamos que ya no hay NaN
+analyzer.missing_values_analysis()
+
+
+# Convetiremos las fechas a formato datetime y preparamos para trabajar como serie temporal
+
 import pandas as pd
 
-# Convertir dataset_end_date a UTC, de cara a manejar la fecha
-dataset_end_date = pd.Timestamp(datetime(2023, 12, 31), tz="UTC")  # Asegurarse de que sea UTC
-one_year_ago = dataset_end_date - pd.Timedelta(days=365)
+# Se convierten las columnas de fechas a formato datetime
+df['lastUpdated'] = pd.to_datetime(df['lastUpdated'], errors='coerce')
+df['dateAdded'] = pd.to_datetime(df['dateAdded'], errors='coerce')
+analyzer.overview()
 
-min_volume = 1e4  # 1e4 = 10,000. Solo incluir criptomonedas con al menos 10,000 unidades transaccionadas en 24h
-min_market_cap = 1e6  # 1e6 = 1,000,000. Solo incluir criptomonedas con capitalización >= 1,000,000
-top_n_rank = 50  # Considerar las 50 mejores posicionadas según cmc_rank
-
-# Asegurarse de que las fechas en la columna 'date_added' estén en UTC
-df['date_added'] = pd.to_datetime(df['date_added'], errors='coerce')  # Convertir a datetime
-df['date_added'] = df['date_added'].dt.tz_convert("UTC")  # Convertir a UTC si no lo está
-
-# Filtrar el dataset según los criterios definidos
-df_combined_filtered = df[
-    (df['volume_24h'] >= min_volume) &  # Criptomonedas con volumen >= 10,000
-    (df['market_cap'] >= min_market_cap) &  # Criptomonedas con capitalización >= 1,000,000
-    (df['date_added'] <= one_year_ago) &  # Criptomonedas añadidas hace más de un año
-    (df['cmc_rank'] <= top_n_rank)  # Criptomonedas en el Top 50
-]
-
-# Eliminar duplicados
-df_combined_filtered = df_combined_filtered.drop_duplicates()
-
-# Mostrar las dimensiones del dataset reducido
-print("\nDataset reducido basado en múltiples criterios:")
-print(df_combined_filtered.shape)
-print("\nPrimeras filas del dataset reducido:")
-print(df_combined_filtered.head())
-
-# Exportar el dataset reducido a la ruta indicada
-export_path = "EDA/CoinMarketCap/dataSet/currencies_data_DIC_2024_reduced.csv"
-df_combined_filtered.to_csv(export_path, index=False)
-print(f"\nDataset reducido exportado correctamente a: {export_path}")
-
-# Importamos el nuevo dataSet para trabajar con él
-df_path = os.path.join(project_root, "dataSet")
-print(f"Ruta del dataset: {df_path}")
-df = "currencies_data_DIC_2024_reduced.csv"
-
-#---------------- CARGAR Y PROCESAR LOS DATOS -------------------#
-try:
-    loader = DataLoader(df_path=df_path, df=df)
-    df = loader.load_data()
-    print("\n--- Dataset cargado correctamente ---")
-except FileNotFoundError as e:
-    print(f"Error al cargar el dataset: {e}")
-    df = None
-except ValueError as e:
-    print(f"Error de valor en el dataset: {e}")
-    df = None
-
-# Si los datos se cargaron, proceder al análisis
-if df is not None:
-    # Instanciar el analizador
-    analyzer = DataAnalyzer(df)
-
-    # Llamadas a los métodos del analizador para verificar si se están cargando o no
-    #print(dir(analyzer))  # Verifica que 'nan_summary' esté listado
-
-    analyzer.overview()
-    analyzer.duplicates_analysis()
-    analyzer.missing_values_analysis()
-    analyzer.data_types_analysis()
-    print("Columnas categóricas detectadas:", analyzer.columns_cat)
-    print("Columnas numéricas detectadas:", analyzer.columns_num)
-    #analyzer.nan_summary()
-else:
-    print("\n--- No se pudo cargar el dataset. Análisis abortado ---")
-
-# Rellenamos los NaN en Maxsuply
-
-# Rellenar NaN con 0 (mantiene el conteo de NaN pero es un 0)
-df_combined_filtered['maxSupply'] = df_combined_filtered['maxSupply'].fillna(0)
-print("\nPrimeras filas después de rellenar NaN en maxSupply:")
-print(df_combined_filtered['maxSupply'].head())
+# Se crea un índice temporal sin eliminar la columna dateAdded (por si queremos trabajar una serie temporal en algún momento)
+df.set_index('dateAdded', inplace=True , drop=False)
+print(df.index)
 
 
-    #---------------- VISUALIZAR LOS DATOS -------------------#
+# Ordenar el DataFrame por el índice (dateAdded)
+df.sort_index(inplace=True)
+print(df.index.is_monotonic_increasing)  # Debe devolver True si está ordenado
 
-from utils.visualization import DataVisualizationCoordinator
 
-print("\n--- Visualización Combinada ---")
+# Crear columnas derivadas de 'dateAdded', para estudiar el momento en que se agregaron estas
+df['year_added'] = df.index.year
+df['month_added'] = df.index.month
+df['day_added'] = df.index.day
+df['weekday_added'] = df.index.weekday  # 0 = Lunes, 6 = Domingo
+print(df[['year_added', 'month_added', 'day_added', 'weekday_added']].head())
+analyzer.overview()
 
-# Columnas seleccionadas para las visualizaciones
-x_col = "Grocery"      # Columna para el eje X del scatterplot
-y_col = "Milk"         # Columna para el eje Y del scatterplot
-bar_box_col = "Grocery"  # Columna para el barplot y boxplot
-cluster_col = "Channel"  # Columna de clusters
 
-# Instanciar el coordinador de visualizaciones
-viz_coordinator = DataVisualizationCoordinator(df)
+# Normalizamos la info para ver si hay más duplicados
+df['name'] = df['name'].str.strip().str.title()  # Títulos con mayúscula inicial
+df['symbol'] = df['symbol'].str.strip().str.upper()  # Símbolos en mayúsculas
+print(df[['name', 'symbol']].head())
 
-# Generar todas las visualizaciones en una sola ventana
-try:
-    viz_coordinator.plot_all(x=x_col, y=y_col, column=bar_box_col, clusters=cluster_col)
-except KeyError as e:
-    print(f"Error en las visualizaciones: {e}")
-    print("Columnas disponibles en el DataFrame:", df.columns.tolist())
-    
+# Verificar duplicados entre 'name' y 'symbol'
+duplicados = df[df.duplicated(subset=['name', 'symbol'], keep=False)]
+print(duplicados)
+print(f"Duplicados encontrados: {duplicados.shape[0]}")
+'''Y vemos que efectivamente tras poner la primera en mayúscula y todos los symbol en mayúscula también
+aparecen 62 duplicados para Symbol, que es el USD, que indica el valor en esta moneda para esta cripto como
+valor par, esto no nos interesa por lo que las eliminamos, nos interesa el valor en su symbolo'''
+
+
+# Filtrar filas donde el symbol no sea 'USD'
+pares_no_deseados = ['USD', 'EUR', 'GBP']
+df = df[~df['symbol'].isin(pares_no_deseados)]
+print(f"Filas restantes después de eliminar pares no deseados: {df.shape[0]}")
+
+
+# Tratamos las dos categóricas que nos faltan name y symbol
+'''La estrategia es la siguente:
+Crearmos un diccionario que mapee el nombre y simbolo con el label_enconder
+de esta manera podemos referenciar este archvio a futuras visualizacionciones o mapeos'''
+
+from sklearn.preprocessing import LabelEncoder
+
+# Crear el codificador para 'symbol'
+le = LabelEncoder()
+df['symbol_encoded'] = le.fit_transform(df['symbol'])
+
+# Crear el diccionario
+mapping_df = df[['name', 'symbol', 'symbol_encoded']].drop_duplicates()
+
+# Guardar el diccionario en un archivo CSV
+mapping_df.to_csv('dataSet/symbol_name_encoded_mapping.csv', index=False)
+print("Diccionario de mapeo creado y guardado como 'symbol_name_encoded_mapping.csv'")
+
+# Eliminar las columnas 'name' y 'symbol' del dataset principal
+df = df.drop(columns=['name', 'symbol'])
+analyzer.data_types_analysis()
+analyzer.update_data(df)
