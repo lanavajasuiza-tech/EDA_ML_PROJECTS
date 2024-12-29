@@ -150,3 +150,44 @@ print(df.columns.tolist())
 # Save the cleaned dataset ready for further analysis and/or training
 df.to_csv('EDA/CoinMarketCap/dataSet/currencies_data_ready.csv', index=False)
 print("Dataset ready and saved as 'currencies_data_ready.csv'")
+
+
+#-------> VISUALIZAMOS 
+
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Filter data to remove rows with extreme outliers or missing values
+filtered_df = df[(df['maxSupply'] > 0) & (df['price'] > 0)].copy()
+filtered_df['maxSupply_jittered'] = filtered_df['maxSupply'] + np.random.uniform(-1e16, 1e16, size=len(filtered_df))
+
+# Convert 'dateAdded' to datetime (if not already done)
+filtered_df['dateAdded'] = pd.to_datetime(filtered_df['dateAdded'], errors='coerce')
+
+# Initialize the plot
+plt.figure(figsize=(14, 8))
+
+# Scatter plot with jittered maxSupply
+sns.scatterplot(
+    data=filtered_df,
+    x='dateAdded',
+    y='maxSupply_jittered',
+    hue='price',
+    size='price',
+    sizes=(20, 200),
+    palette=sns.color_palette(['#4c72b0', '#55a868', '#c44e52']),  # Changed to a professional "Blues" palette
+    alpha=0.8
+)
+
+# Enhance the plot with titles and labels
+plt.title('Cryptocurrency Max Supply Over Time, Colored by Price (With Jitter)', fontsize=16, pad=20)
+plt.xlabel('Date Added', fontsize=12)
+plt.ylabel('Max Supply (Jittered)', fontsize=12)
+plt.legend(title='Price ($)', fontsize=10, loc='upper left', bbox_to_anchor=(1.02, 1))
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.tight_layout()
+
+# Show the plot
+plt.show()
