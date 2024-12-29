@@ -33,7 +33,7 @@ print("Directorio raíz detectado dinámicamente:", project_root)
 # Ruta simplificada al dataset
 df_path = os.path.join(project_root, "dataSet")
 print(f"Ruta del dataset: {df_path}")
-df = "currencies_data_2023.csv"
+df = "currencies_data_DIC_2024.csv"
 
 #---------------- CARGAR Y PROCESAR LOS DATOS -------------------#
 try:
@@ -66,10 +66,10 @@ else:
 '''
 El DataSet es muy grande  vamos a reducirlo siguiendo estos criterios:
 0. Convertir los dato tipo fecha para manejar la información y prepararlo para predicciones temporales.
-1. Volumen de mercado (volume24h): Las criptomonedas con mayor actividad.
+1. Volumen de mercado (volume_24h): Las criptomonedas con mayor actividad.
 2. Capitalización de mercado (marketCap): Las criptomonedas más valiosas.
-3. Antigüedad (dateAdded): Las criptomonedas con más historia.
-4. Ranking (cmcRank): Seleccionar las criptomonedas mejor posicionadas.'''
+3. Antigüedad (date_added): Las criptomonedas con más historia.
+4. Ranking (cmc_rank): Seleccionar las criptomonedas mejor posicionadas.'''
 
 
 # Filtrar criptomonedas según múltiples criterios
@@ -83,18 +83,18 @@ one_year_ago = dataset_end_date - pd.Timedelta(days=365)
 
 min_volume = 1e4  # 1e4 = 10,000. Solo incluir criptomonedas con al menos 10,000 unidades transaccionadas en 24h
 min_market_cap = 1e6  # 1e6 = 1,000,000. Solo incluir criptomonedas con capitalización >= 1,000,000
-top_n_rank = 50  # Considerar las 50 mejores posicionadas según cmcRank
+top_n_rank = 50  # Considerar las 50 mejores posicionadas según cmc_rank
 
-# Asegurarse de que las fechas en la columna 'dateAdded' estén en UTC
-df['dateAdded'] = pd.to_datetime(df['dateAdded'], errors='coerce')  # Convertir a datetime
-df['dateAdded'] = df['dateAdded'].dt.tz_convert("UTC")  # Convertir a UTC si no lo está
+# Asegurarse de que las fechas en la columna 'date_added' estén en UTC
+df['date_added'] = pd.to_datetime(df['date_added'], errors='coerce')  # Convertir a datetime
+df['date_added'] = df['date_added'].dt.tz_convert("UTC")  # Convertir a UTC si no lo está
 
 # Filtrar el dataset según los criterios definidos
 df_combined_filtered = df[
-    (df['volume24h'] >= min_volume) &  # Criptomonedas con volumen >= 10,000
-    (df['marketCap'] >= min_market_cap) &  # Criptomonedas con capitalización >= 1,000,000
-    (df['dateAdded'] <= one_year_ago) &  # Criptomonedas añadidas hace más de un año
-    (df['cmcRank'] <= top_n_rank)  # Criptomonedas en el Top 50
+    (df['volume_24h'] >= min_volume) &  # Criptomonedas con volumen >= 10,000
+    (df['market_cap'] >= min_market_cap) &  # Criptomonedas con capitalización >= 1,000,000
+    (df['date_added'] <= one_year_ago) &  # Criptomonedas añadidas hace más de un año
+    (df['cmc_rank'] <= top_n_rank)  # Criptomonedas en el Top 50
 ]
 
 # Eliminar duplicados
@@ -107,14 +107,14 @@ print("\nPrimeras filas del dataset reducido:")
 print(df_combined_filtered.head())
 
 # Exportar el dataset reducido a la ruta indicada
-export_path = "EDA/CoinMarketCap/dataSet/currencies_data_2023_reduced.csv"
+export_path = "EDA/CoinMarketCap/dataSet/currencies_data_DIC_2024_reduced.csv"
 df_combined_filtered.to_csv(export_path, index=False)
 print(f"\nDataset reducido exportado correctamente a: {export_path}")
 
 # Importamos el nuevo dataSet para trabajar con él
 df_path = os.path.join(project_root, "dataSet")
 print(f"Ruta del dataset: {df_path}")
-df = "currencies_data_2023_reduced.csv"
+df = "currencies_data_DIC_2024_reduced.csv"
 
 #---------------- CARGAR Y PROCESAR LOS DATOS -------------------#
 try:
