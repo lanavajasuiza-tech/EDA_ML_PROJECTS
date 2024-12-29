@@ -1,159 +1,152 @@
 """
-This dataset contains information about cryptocurrency prices, market capitalization, and other metrics. The data is collected from CoinMarketCap (
-https://coinmarketcap.com/), a popular website that tracks cryptocurrency prices.
+This dataset contains information about cryptocurrency prices, market capitalization, and other metrics. 
+The data is collected from CoinMarketCap (https://coinmarketcap.com/), a popular website that tracks cryptocurrency prices.
 
 This dataset can be used to:
-
-Analyze the price trends of different cryptocurrencies.
-Compare the market capitalization of different cryptocurrencies. -
-Look at the circulating supply of different cryptocurrencies.
-Analyze the trading volume of different cryptocurrencies.
-Look at the volatility of different cryptocurrencies.
-Compare the performance of different cryptocurrencies against each other or against a benchmark index.
-Identify correlations between different cryptocurrency prices.
-Use the data to build models to predict future prices or other trends.
+- Analyze the price trends of different cryptocurrencies.
+- Compare the market capitalization of different cryptocurrencies.
+- Examine the circulating supply of different cryptocurrencies.
+- Analyze the trading volume of different cryptocurrencies.
+- Study the volatility of different cryptocurrencies.
+- Compare the performance of different cryptocurrencies against each other or against a benchmark index.
+- Identify correlations between different cryptocurrency prices.
+- Use the data to build models to predict future prices or other trends.
 
 +Info: https://www.kaggle.com/datasets/harshalhonde/coinmarketcap-cryptocurrency-dataset-2023
 """
-
 
 import sys
 import os
 from utils.processing import DataLoader
 from utils.analyzer import DataAnalyzer
 
-#---------------- CARGAR DATASET -------------------#
+# ---------------- LOAD DATASET -------------------#
 
-# Detectar dinámicamente el directorio raíz del proyecto
+# Dynamically detect the project's root directory
 project_root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(project_root)
-print("Directorio raíz detectado dinámicamente:", project_root)
+print("Dynamically detected root directory:", project_root)
 
-
-# Ruta simplificada al dataset
+# Simplified dataset path
 df_path = os.path.join(project_root, "dataSet")
-print(f"Ruta del dataset: {df_path}")
+print(f"Dataset path: {df_path}")
 df = "currencies_data_Kaggle_2023_unique.csv"
 
-#---------------- CARGAR Y ANALIZAR LOS DATOS -------------------#
+# ---------------- LOAD AND ANALYZE DATA -------------------#
 try:
     loader = DataLoader(df_path=df_path, df=df)
     df = loader.load_data()
-    print("\n--- Dataset cargado correctamente ---")
+    print("\n--- Dataset successfully loaded ---")
 except FileNotFoundError as e:
-    print(f"Error al cargar el dataset: {e}")
+    print(f"Error loading dataset: {e}")
     df = None
 except ValueError as e:
-    print(f"Error de valor en el dataset: {e}")
+    print(f"Dataset value error: {e}")
     df = None
 
-# Si los datos se cargaron, proceder al análisis
+# Proceed with analysis if data is loaded
 if df is not None:
-    # Instanciar el analizador
+    # Instantiate the analyzer
     analyzer = DataAnalyzer(df)
 
-    # Llamadas a los métodos del analizador para verificar si se están cargando o no
-    #print(dir(analyzer))  # Verifica que 'nan_summary' esté listado
-
+    # Call analyzer methods to verify functionality
     analyzer.overview()
     analyzer.duplicates_analysis()
-    analyzer.missing_values_analysis() # Tarda entre 7 y 10 minutos, paciencia ...
+    analyzer.missing_values_analysis()  # Takes 7-10 minutes; please be patient...
     analyzer.data_types_analysis()
 else:
-    print("\n--- No se pudo cargar el dataset. Análisis abortado ---")
+    print("\n--- Could not load the dataset. Analysis aborted ---")
 
-#---------------- PROCESAR LOS DATOS -------------------#
+# ---------------- PROCESS DATA -------------------#
 
 '''
-Vamos a tratar las fechas, los NaN: y los valores categóricos
+We will handle dates, NaN values, and categorical variables
 '''
 
-# Por lo pronto, nos cargamos name.1 que está duplicada
+# For now, drop 'name.1', which is duplicated
 
 if 'name.1' in df.columns:
     df.drop(columns=['name.1'], inplace=True)
-    print("Columna 'name.1' eliminada.")
+    print("Column 'name.1' removed.")
     analyzer.data_types_analysis()
 
-
-# Veamos que columnas tienen Nan
-nan_por_columna = df.isnull().sum()
-print(nan_por_columna[nan_por_columna > 0])
-'''La columna maxSupply contiene todos los NaN
-y se debe a que no hay datos así que lo vamos a rellenar con 0'''
+# Check columns with NaN values
+nan_by_column = df.isnull().sum()
+print(nan_by_column[nan_by_column > 0])
+'''The column maxSupply contains all NaN values
+and this is because the data is unavailable, so we will fill it with 0.'''
 
 df.fillna(0, inplace=True)
-print(f"Valores NaN restantes: {df.isnull().sum().sum()}") # confirmamos que ya no hay NaN
+print(f"Remaining NaN values: {df.isnull().sum().sum()}")  # Confirm no NaN values remain
 analyzer.missing_values_analysis()
 
-
-# Convetiremos las fechas a formato datetime y preparamos para trabajar como serie temporal
+# Convert dates to datetime format and prepare for time series analysis
 
 import pandas as pd
 
-# Se convierten las columnas de fechas a formato datetime
+# Convert date columns to datetime format
 df['lastUpdated'] = pd.to_datetime(df['lastUpdated'], errors='coerce')
 df['dateAdded'] = pd.to_datetime(df['dateAdded'], errors='coerce')
 analyzer.overview()
 
-# Se crea un índice temporal sin eliminar la columna dateAdded (por si queremos trabajar una serie temporal en algún momento)
-df.set_index('dateAdded', inplace=True , drop=False)
+# Create a temporal index without dropping the column dateAdded (in case we want to work with time series later)
+df.set_index('dateAdded', inplace=True, drop=False)
 print(df.index)
 
-
-# Ordenar el DataFrame por el índice (dateAdded)
+# Sort the DataFrame by the index (dateAdded)
 df.sort_index(inplace=True)
-print(df.index.is_monotonic_increasing)  # Debe devolver True si está ordenado
+print(df.index.is_monotonic_increasing)  # Should return True if sorted
 
-
-# Crear columnas derivadas de 'dateAdded', para estudiar el momento en que se agregaron estas
+# Create derived columns from 'dateAdded' to study when cryptocurrencies were added
 df['year_added'] = df.index.year
 df['month_added'] = df.index.month
 df['day_added'] = df.index.day
-df['weekday_added'] = df.index.weekday  # 0 = Lunes, 6 = Domingo
+df['weekday_added'] = df.index.weekday  # 0 = Monday, 6 = Sunday
 print(df[['year_added', 'month_added', 'day_added', 'weekday_added']].head())
 analyzer.overview()
+df.head()
 
-
-# Normalizamos la info para ver si hay más duplicados
-df['name'] = df['name'].str.strip().str.title()  # Títulos con mayúscula inicial
-df['symbol'] = df['symbol'].str.strip().str.upper()  # Símbolos en mayúsculas
+# Normalize the data to check for more duplicates
+df['name'] = df['name'].str.strip().str.title()  # Title case for names
+df['symbol'] = df['symbol'].str.strip().str.upper()  # Uppercase for symbols
 print(df[['name', 'symbol']].head())
 
-# Verificar duplicados entre 'name' y 'symbol'
-duplicados = df[df.duplicated(subset=['name', 'symbol'], keep=False)]
-print(duplicados)
-print(f"Duplicados encontrados: {duplicados.shape[0]}")
-'''Y vemos que efectivamente tras poner la primera en mayúscula y todos los symbol en mayúscula también
-aparecen 62 duplicados para Symbol, que es el USD, que indica el valor en esta moneda para esta cripto como
-valor par, esto no nos interesa por lo que las eliminamos, nos interesa el valor en su symbolo'''
+# Check for duplicates between 'name' and 'symbol'
+duplicates = df[df.duplicated(subset=['name', 'symbol'], keep=False)]
+print(duplicates)
+print(f"Found duplicates: {duplicates.shape[0]}")
+'''After normalizing to title case for names and uppercase for symbols,
+we found 62 duplicates for Symbol, which corresponds to USD, indicating the value in dollars
+for these cryptocurrencies as a pair value. This is not relevant, so we remove them, focusing on their symbol value.'''
 
-
-# Filtrar filas donde el symbol no sea 'USD'
-pares_no_deseados = ['USD', 'EUR', 'GBP']
-df = df[~df['symbol'].isin(pares_no_deseados)]
-print(f"Filas restantes después de eliminar pares no deseados: {df.shape[0]}")
-
-
-# Tratamos las dos categóricas que nos faltan name y symbol
-'''La estrategia es la siguente:
-Crearmos un diccionario que mapee el nombre y simbolo con el label_enconder
-de esta manera podemos referenciar este archvio a futuras visualizacionciones o mapeos'''
+# Handle the two remaining categorical variables: name and symbol
+'''The strategy is as follows:
+Create a dictionary mapping names to their LabelEncoder values.
+This allows us to reference this file for future visualizations or mappings.'''
 
 from sklearn.preprocessing import LabelEncoder
 
-# Crear el codificador para 'symbol'
+# Create a LabelEncoder for 'name'
 le = LabelEncoder()
-df['symbol_encoded'] = le.fit_transform(df['symbol'])
+df['name_encoded'] = le.fit_transform(df['name'])
 
-# Crear el diccionario
-mapping_df = df[['name', 'symbol', 'symbol_encoded']].drop_duplicates()
+# Create a dictionary mapping 'name' -> 'name_encoded'
+name_to_encoded = dict(zip(df['name'], df['name_encoded']))
 
-# Guardar el diccionario en un archivo CSV
-mapping_df.to_csv('dataSet/symbol_name_encoded_mapping.csv', index=False)
-print("Diccionario de mapeo creado y guardado como 'symbol_name_encoded_mapping.csv'")
+# Verify the result
+print("First encoded values:")
+print(df[['name', 'name_encoded']].head())
 
-# Eliminar las columnas 'name' y 'symbol' del dataset principal
+# Save the dictionary to a CSV file
+mapping_df = pd.DataFrame(list(name_to_encoded.items()), columns=['name', 'name_encoded'])
+mapping_df.to_csv('EDA/CoinMarketCap/dataSet/name_encoded_mapping.csv', index=False)
+print("Mapping dictionary created and saved as 'name_encoded_mapping.csv'")
+
+# Remove columns 'name' and 'symbol'
 df = df.drop(columns=['name', 'symbol'])
-analyzer.data_types_analysis()
-analyzer.update_data(df)
+print("Remaining columns after removing 'name' and 'symbol':")
+print(df.columns.tolist())
+
+# Save the cleaned dataset ready for further analysis and/or training
+df.to_csv('EDA/CoinMarketCap/dataSet/currencies_data_ready.csv', index=False)
+print("Dataset ready and saved as 'currencies_data_ready.csv'")
