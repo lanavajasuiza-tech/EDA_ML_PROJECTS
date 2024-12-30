@@ -1,6 +1,7 @@
 """
 Author: Ana Ndongo
 Date: 27 December 2024
+Kaggle dataSet: https://www.kaggle.com/datasets/asaniczka/data-science-job-postings-and-skills
 Description:
 
 LinkedIn is a popular professional networking platform with millions of job postings across various industries.
@@ -28,7 +29,7 @@ print("Directorio raíz detectado dinámicamente:", project_root)
 # Ruta simplificada al dataset
 df_path = os.path.join(project_root, "dataSet")
 print(f"Ruta del dataset: {df_path}")
-df = "currencies_data.csv"
+df = "Linkedin_Data_Jobs_2024.csv"
 
 #---------------- CARGAR Y PROCESAR LOS DATOS -------------------#
 try:
@@ -54,11 +55,11 @@ if df is not None:
     analyzer.duplicates_analysis()
     analyzer.missing_values_analysis()
     analyzer.data_types_analysis()
-    print("Columnas categóricas detectadas:", analyzer.columns_cat)
-    print("Columnas numéricas detectadas:", analyzer.columns_num)
     #analyzer.nan_summary()
 else:
     print("\n--- No se pudo cargar el dataset. Análisis abortado ---")
+
+    #---------------- PROCESAR LOS DATOS -------------------#
 
 
     #---------------- VISUALIZAR LOS DATOS -------------------#
