@@ -1,4 +1,8 @@
 """
+Author: Ana Ndongo
+Date:  15th December 2024
+Description:
+
 This dataset contains information about cryptocurrency prices, market capitalization, and other metrics. 
 The data is collected from CoinMarketCap (https://coinmarketcap.com/), a popular website that tracks cryptocurrency prices.
 
