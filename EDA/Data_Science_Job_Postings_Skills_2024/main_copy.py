@@ -177,23 +177,35 @@ para este análisis de ejercicio vamos a seguir con lo que tenemos hasta ahora '
 
     #---------------- VISUALIZAR LOS DATOS -------------------#
 
-from utils.visualization import DataVisualizationCoordinator
+#graficamos para buscar un patrón a partir de un heatmap
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from itertools import combinations
+from collections import Counter
 
-print("\n--- Visualización Combinada ---")
+# Cargar el archivo CSV
+skills_df = pd.read_csv("dataSet/unclassified_skills.csv")
 
-# Columnas seleccionadas para las visualizaciones
-x_col = "Grocery"      # Columna para el eje X del scatterplot
-y_col = "Milk"         # Columna para el eje Y del scatterplot
-bar_box_col = "Grocery"  # Columna para el barplot y boxplot
-cluster_col = "Channel"  # Columna de clusters
+# Crear combinaciones de habilidades
+combinations_list = []
+for skills in skills_df["Habilidades no clasificadas"].dropna():
+    skills_split = skills.split(", ")
+    combinations_list.extend(combinations(skills_split, 2))
 
-# Instanciar el coordinador de visualizaciones
-viz_coordinator = DataVisualizationCoordinator(df)
+# Contar las combinaciones más frecuentes
+combinations_counter = Counter(combinations_list)
 
-# Generar todas las visualizaciones en una sola ventana
-try:
-    viz_coordinator.plot_all(x=x_col, y=y_col, column=bar_box_col, clusters=cluster_col)
-except KeyError as e:
-    print(f"Error en las visualizaciones: {e}")
-    print("Columnas disponibles en el DataFrame:", df.columns.tolist())
-    
+# Convertir el contador a un DataFrame
+combinations_df = pd.DataFrame(combinations_counter.items(), columns=["Combination", "Frequency"])
+combinations_df[["Skill1", "Skill2"]] = pd.DataFrame(combinations_df["Combination"].tolist(), index=combinations_df.index)
+combinations_df = combinations_df.drop(columns=["Combination"])
+
+# Crear una matriz para el heatmap
+pivot_table = combinations_df.pivot("Skill1", "Skill2", "Frequency").fillna(0)
+
+# Dibujar el heatmap
+plt.figure(figsize=(15, 12))
+sns.heatmap(pivot_table, cmap="Blues", linewidths=0.5)
+plt.title("Mapa de Calor: Combinaciones de Habilidades Más Frecuentes")
+plt.show()

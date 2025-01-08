@@ -6,7 +6,7 @@ import sys
 import sys
 
 # Ruta del proyecto
-project_root = r"C:/Users/rportatil112/Documents/EDA_ML_PROJECTS/EDA/Data_Science_Job_Postings_Skills_2024"
+project_root = r"/home/ana/Documentos/EDA_ML_PROJECTS/EDA/Data_Science_Job_Postings_Skills_2024"
 
 # Añadir solo la ruta si no está presente
 if project_root not in sys.path:
