@@ -1,5 +1,7 @@
-.csv
+*.csv
 z*
-.txt
-.docx
-.pdf
+*.txt
+*.docx
+*.pdf
+*.jar
+dataSet

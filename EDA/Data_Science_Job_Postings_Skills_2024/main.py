@@ -176,24 +176,44 @@ print("Archivo 'unclassified_skills.csv' exportado correctamente.")
 para este análisis de ejercicio vamos a seguir con lo que tenemos hasta ahora '''
 
     #---------------- VISUALIZAR LOS DATOS -------------------#
+import pandas as pd
+import matplotlib.pyplot as plt
+from itertools import combinations
+from collections import Counter
 
-from utils.visualization import DataVisualizationCoordinator
+# Cargar el archivo CSV
+skills_df = pd.read_csv("dataSet/unclassified_skills.csv")
 
-print("\n--- Visualización Combinada ---")
+# Crear combinaciones de habilidades
+combinations_list = []
+for skills in skills_df["Habilidades no clasificadas"].dropna():
+    skills_split = skills.split(", ")
+    if len(skills_split) > 1:
+        combinations_list.extend(combinations(skills_split, 2))
 
-# Columnas seleccionadas para las visualizaciones
-x_col = "Grocery"      # Columna para el eje X del scatterplot
-y_col = "Milk"         # Columna para el eje Y del scatterplot
-bar_box_col = "Grocery"  # Columna para el barplot y boxplot
-cluster_col = "Channel"  # Columna de clusters
+# Contar las combinaciones más frecuentes
+combinations_counter = Counter(combinations_list)
 
-# Instanciar el coordinador de visualizaciones
-viz_coordinator = DataVisualizationCoordinator(df)
+# Filtrar combinaciones que aparecen más de una vez
+filtered_combinations = {k: v for k, v in combinations_counter.items() if v > 1}
 
-# Generar todas las visualizaciones en una sola ventana
-try:
-    viz_coordinator.plot_all(x=x_col, y=y_col, column=bar_box_col, clusters=cluster_col)
-except KeyError as e:
-    print(f"Error en las visualizaciones: {e}")
-    print("Columnas disponibles en el DataFrame:", df.columns.tolist())
-    
+# Convertir el contador a un DataFrame
+combinations_df = pd.DataFrame(filtered_combinations.items(), columns=["Combination", "Frequency"])
+combinations_df["Skill1"] = combinations_df["Combination"].apply(lambda x: x[0])
+combinations_df["Skill2"] = combinations_df["Combination"].apply(lambda x: x[1])
+combinations_df = combinations_df.drop(columns=["Combination"])
+
+# Comprobar si el DataFrame tiene datos
+if combinations_df.empty:
+    print("No se generaron combinaciones suficientes para visualizar.")
+else:
+    # Ordenar por frecuencia y seleccionar las 20 combinaciones más comunes
+    top_combinations = combinations_df.sort_values(by="Frequency", ascending=False).head(20)
+
+    # Crear un gráfico de barras horizontal
+    plt.figure(figsize=(12, 8))
+    plt.barh(top_combinations.apply(lambda x: f"{x['Skill1']} + {x['Skill2']}", axis=1), top_combinations["Frequency"], color="skyblue")
+    plt.xlabel("Frecuencia")
+    plt.title("Top 20 Combinaciones de Habilidades Más Frecuentes")
+    plt.gca().invert_yaxis()  # Invertir el eje Y para mostrar las barras en orden descendente
+    plt.show()

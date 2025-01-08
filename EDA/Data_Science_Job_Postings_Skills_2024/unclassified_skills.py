@@ -1,14 +1,15 @@
+import os
+print("Archivo 'classified_skills.csv' existe:", os.path.exists("output/classified_skills.csv"))
+
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 import umap
 import hdbscan
-import os
 
-print("Archivo 'unclassified_skills.csv' existe:", os.path.exists("output/unclassified_skills.csv"))
 
 
 # Cargar el archivo CSV
-skills_df = pd.read_csv("output/unclassified_skills.csv")
+skills_df = pd.read_csv("output/classified_skills.csv")
 
 # Instanciar el modelo preentrenado
 model = SentenceTransformer('all-MiniLM-L6-v2')

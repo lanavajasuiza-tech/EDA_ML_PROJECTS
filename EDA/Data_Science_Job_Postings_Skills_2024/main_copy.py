@@ -176,10 +176,7 @@ print("Archivo 'unclassified_skills.csv' exportado correctamente.")
 para este análisis de ejercicio vamos a seguir con lo que tenemos hasta ahora '''
 
     #---------------- VISUALIZAR LOS DATOS -------------------#
-
-#graficamos para buscar un patrón a partir de un heatmap
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 from itertools import combinations
 from collections import Counter
@@ -191,21 +188,32 @@ skills_df = pd.read_csv("dataSet/unclassified_skills.csv")
 combinations_list = []
 for skills in skills_df["Habilidades no clasificadas"].dropna():
     skills_split = skills.split(", ")
-    combinations_list.extend(combinations(skills_split, 2))
+    if len(skills_split) > 1:
+        combinations_list.extend(combinations(skills_split, 2))
 
 # Contar las combinaciones más frecuentes
 combinations_counter = Counter(combinations_list)
 
+# Filtrar combinaciones que aparecen más de una vez
+filtered_combinations = {k: v for k, v in combinations_counter.items() if v > 1}
+
 # Convertir el contador a un DataFrame
-combinations_df = pd.DataFrame(combinations_counter.items(), columns=["Combination", "Frequency"])
-combinations_df[["Skill1", "Skill2"]] = pd.DataFrame(combinations_df["Combination"].tolist(), index=combinations_df.index)
+combinations_df = pd.DataFrame(filtered_combinations.items(), columns=["Combination", "Frequency"])
+combinations_df["Skill1"] = combinations_df["Combination"].apply(lambda x: x[0])
+combinations_df["Skill2"] = combinations_df["Combination"].apply(lambda x: x[1])
 combinations_df = combinations_df.drop(columns=["Combination"])
 
-# Crear una matriz para el heatmap
-pivot_table = combinations_df.pivot("Skill1", "Skill2", "Frequency").fillna(0)
+# Comprobar si el DataFrame tiene datos
+if combinations_df.empty:
+    print("No se generaron combinaciones suficientes para visualizar.")
+else:
+    # Ordenar por frecuencia y seleccionar las 20 combinaciones más comunes
+    top_combinations = combinations_df.sort_values(by="Frequency", ascending=False).head(20)
 
-# Dibujar el heatmap
-plt.figure(figsize=(15, 12))
-sns.heatmap(pivot_table, cmap="Blues", linewidths=0.5)
-plt.title("Mapa de Calor: Combinaciones de Habilidades Más Frecuentes")
-plt.show()
+    # Crear un gráfico de barras horizontal
+    plt.figure(figsize=(12, 8))
+    plt.barh(top_combinations.apply(lambda x: f"{x['Skill1']} + {x['Skill2']}", axis=1), top_combinations["Frequency"], color="skyblue")
+    plt.xlabel("Frecuencia")
+    plt.title("Top 20 Combinaciones de Habilidades Más Frecuentes")
+    plt.gca().invert_yaxis()  # Invertir el eje Y para mostrar las barras en orden descendente
+    plt.show()
