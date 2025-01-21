@@ -215,32 +215,12 @@ import re
 
 # Patrones mejorados
 patterns = [
-    r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}',  # Fechas
-    r'(?:[a-zA-Z]+\s[a-zA-Z]+)',  # Usuarios (simple nombre y apellido)
-    r'wrote:',  # "wrote:"
-    r'<https?://[^\s]+>'  # URLs completas, incluyendo fragmentos
-    r'\bmail https\b'  # Eliminamos la combinación "mail https"
-    r'\bhttps\b'  # Eliminamos cualquier instancia solitaria de "https"
-    r'(\shttps\s)+\s*'  # Combinaciones de "https" repetidas, por ejemplo, "https https"
-    r'<[^>]+>',  # Etiquetas HTML (eliminamos cualquier etiqueta HTML)
-    r'line \d+',  # Líneas de código como "line 103"
-    r'./[^\s]+',  # Rutas de archivos como "./src/java/main"
-    r'bq\.',  # "bq."
-    r'on\b',  # "on" como palabra aislada
-    r'\bsr\b',  # Eliminamos "sr"
-    r'(- mail\.)',  # Referencias a email
-    r'visit:',  # Eliminamos 'visit' de los enlaces
-    r'testing',  # "testing"
-    r'\b(diff|pre|fixed|summary|good|thanks|nodes|elaborate)\b',  # Palabras sin valor contextual
-    r'\s+',  # Eliminamos espacios repetidos (convertimos múltiples espacios en uno solo)
-    r'bq\. bq\.',  # Eliminamos repeticiones innecesarias de "bq. bq."
-    r'[^a-zA-Z\s]+',  # Eliminamos caracteres no alfanuméricos
-    r'\s{2,}',  # Espacios repetidos (más de un espacio entre palabras)
-    r'<https?://[^\s]+>',  # URLs completas, incluyendo fragmentos
-    r'\bmail https\b',  # Eliminamos la combinación "mail https"
-    r'\bhttps\b',  # Eliminamos cualquier instancia solitaria de "https"
-    r'(\shttps\s)+',  # Eliminar combinaciones repetidas de "https"
-    r'\s{2,}',  # Eliminamos múltiples espacios
+        r'bq\.',  # "bq."
+        r'on \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}, [a-zA-Z\s]+ wrote:', # Elimina el patron "on fecha, usuario wrote:""
+        r'<https://reviews.apache.org/[^\s]+>', # Elimina cualquier patrón tras "<https://reviews.apache.org/"
+        r'src/[\w/.-]+',  # Esto captura la ruta del archivo
+        r',?\s*line\s*\d+\s*>',  # Esto captura "line" con espacios alrededor y el número de línea
+        r'\s*>\s*', # Nuevo patrón para eliminar los ">" respetando los espacios entre palabras
 
 ]
 
@@ -254,4 +234,13 @@ def clean_text(text):
 df['Cleaned_Comment'] = df['Comment'].apply(clean_text)
 
 # Verificamos el resultado después de aplicar la limpieza
-print(df[['Comment','Cleaned_Comment']].head(100))
+print(df[['Comment','Cleaned_Comment']])
+
+# Asumiendo que df es tu DataFrame con las columnas 'Comment' y 'Cleaned_Comment'
+# Exportar a Excel
+df[['Comment', 'Cleaned_Comment']].to_excel('data/cleaned_comments_output.xlsx', index=False)
+
+print("El archivo Excel se ha guardado correctamente.")
+
+print("Nombres de las columnas:", df.columns.tolist())
+

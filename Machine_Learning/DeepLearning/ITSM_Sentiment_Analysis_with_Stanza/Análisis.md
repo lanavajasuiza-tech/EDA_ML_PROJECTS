@@ -41,3 +41,12 @@ Valores de la columna Valores únicos en 'Benchmark_results_of_sentiment':
 | (0.4, 0.6]       | 792        | Positivo     |
 | (0.6, 0.8]       | 353        | Muy positivo |
 | (0.8, 1.0]       | 83         | Muy positivo |
+
+## Estudio y visualización
+
+Revisamos la información y nos centramos en intentar entender y sacar más información de la columna comentarios. Sabiendo que se trata de comenarios técnicos se intenta discriminar información que pueda servirnos para entender el comportatamiento del equipoo, sus roles, expresióne, etc,...
+
+
+Visualizamos
+
+![1737462467222](image/Análisis/1737462467222.png)
