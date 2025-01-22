@@ -242,5 +242,101 @@ df[['Comment', 'Cleaned_Comment']].to_excel('data/cleaned_comments_output.xlsx',
 
 print("El archivo Excel se ha guardado correctamente.")
 
+# Se vuelve a verificar la consistencia de las columnas existentes
 print("Nombres de las columnas:", df.columns.tolist())
 
+# --- VISUALIZAMOS LA INFORMACION HASTA AHORA ---
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Crear la figura y los subgráficos
+fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+
+# --- 1. DISTRIBUCIÓN DE LOS SENTIMIENTOS ---
+sentiment_counts = df['Sentiment_category'].value_counts()
+sentiment_counts.plot(kind='bar', color=['skyblue', 'lightgreen', 'lightcoral', 'lightyellow'], ax=axes[0, 0])
+axes[0, 0].set_title('Distribución de los Sentimientos', fontsize=14)
+axes[0, 0].set_xlabel('Categoría de Sentimiento', fontsize=12)
+axes[0, 0].set_ylabel('Número de Comentarios', fontsize=12)
+axes[0, 0].tick_params(axis='x', rotation=45)
+
+# --- 2. FRECUENCIA DE COMENTARIOS POR FECHA ---
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+comments_by_date = df.groupby(df['Date'].dt.date).size()
+comments_by_date.plot(kind='line', color='teal', marker='o', ax=axes[0, 1])
+axes[0, 1].set_title('Frecuencia de Comentarios por Fecha', fontsize=14)
+axes[0, 1].set_xlabel('Fecha', fontsize=12)
+axes[0, 1].set_ylabel('Número de Comentarios', fontsize=12)
+axes[0, 1].tick_params(axis='x', rotation=45)
+axes[0, 1].grid(True)
+
+# --- 3. COMENTARIOS POR USUARIO Y SENTIMIENTO (BARRAS APILADAS) ---
+user_comments = df.groupby('User')['Sentiment_category'].value_counts().unstack().fillna(0)
+user_comments.plot(kind='bar', stacked=True, figsize=(12, 8), colormap='tab20c', ax=axes[1, 0])
+axes[1, 0].set_title('Comentarios por Usuario y Sentimiento', fontsize=14)
+axes[1, 0].set_xlabel('Usuario', fontsize=12)
+axes[1, 0].set_ylabel('Número de Comentarios', fontsize=12)
+axes[1, 0].tick_params(axis='x', rotation=45)
+axes[1, 0].legend(title='Sentimiento', bbox_to_anchor=(1.05, 1), loc='upper left')
+
+# --- 4. MAPA DE CALOR DE COMENTARIOS POR USUARIO Y SENTIMIENTO ---
+user_sentiment_matrix = pd.crosstab(df['User'], df['Sentiment_category'])
+sns.heatmap(user_sentiment_matrix, annot=True, fmt='d', cmap='coolwarm', cbar=False, ax=axes[1, 1])
+axes[1, 1].set_title('Mapa de Calor de Comentarios por Usuario y Sentimiento', fontsize=14)
+axes[1, 1].set_xlabel('Sentimiento', fontsize=12)
+axes[1, 1].set_ylabel('Usuario', fontsize=12)
+
+# Ajustar el layout para que no se sobrepongan los elementos
+plt.tight_layout()
+
+# Mostrar todos los gráficos
+plt.show()
+
+
+#### APLICAMOS STANZA y LDA ###
+import stanza
+import pandas as pd
+from decorators.timing import timeit  # Decorador importado correctamente
+
+# Inicializar Stanza
+stanza.download('en')  # Solo la primera vez
+nlp = stanza.Pipeline('en', processors='tokenize,lemma')  # Reducir procesadores si es necesario
+
+# Función para procesar con Stanza
+@timeit
+def process_with_stanza(text):
+    if not text or pd.isna(text):  # Manejar valores vacíos o nulos
+        return ""
+    doc = nlp(text)
+    lemmatized_text = " ".join([word.lemma for sent in doc.sentences for word in sent.words])
+    return lemmatized_text
+'''
+# Crear DataFrame de ejemplo (para verificar que estanza funciona)
+df = pd.DataFrame({'Cleaned_Comment': ["This is a test.", "Stanza works well!", "Lemmatization is useful.", None]})
+
+# Aplicar la función con Stanza
+df['Lemmatized_Comment'] = df['Cleaned_Comment'].apply(process_with_stanza)
+
+# Verificar los resultados
+print(df)
+'''
+# Cargar el dataset desde el archivo Excel
+file_path = 'data/cleaned_comments_output.xlsx'  # Ruta del archivo
+df = pd.read_excel(file_path)
+
+# Verificar que las columnas existen
+print("Columnas disponibles:", df.columns.tolist())
+
+# Aplicar la lematización a la columna 'Cleaned_Comment'
+df['Lemmatized_Comment'] = df['Cleaned_Comment'].apply(process_with_stanza)
+
+# Verificar los resultados
+print(df[['Cleaned_Comment', 'Lemmatized_Comment']].head())
+
+'''
+# Opcional: Guardar el DataFrame con la nueva columna
+output_path = 'data/lemmatized_comments_output.xlsx'
+df.to_excel(output_path, index=False)
+print(f"Archivo exportado con éxito: {output_path}")
+'''

@@ -46,7 +46,15 @@ Valores de la columna Valores únicos en 'Benchmark_results_of_sentiment':
 
 Revisamos la información y nos centramos en intentar entender y sacar más información de la columna comentarios. Sabiendo que se trata de comenarios técnicos se intenta discriminar información que pueda servirnos para entender el comportatamiento del equipoo, sus roles, expresióne, etc,...
 
-
 Visualizamos
 
 ![1737462467222](image/Análisis/1737462467222.png)
+
+Profundizamos un poco más en el contexto del dataSet:
+
+* **Frecuencia de palabras** : Entender qué palabras son más recurrentes en los comentarios.
+* **Topic Modeling (LDA)** : Identificar los temas recurrentes en los comentarios para comprender mejor las áreas de conversación.
+* **Análisis temporal detallado** : Ver cómo la actividad en los comentarios cambia con el tiempo, buscando patrones estacionales o picos.
+* **Correlación entre usuarios y sentimientos** : Analizar cómo los comentarios de los usuarios se distribuyen entre los diferentes sentimientos (positivo, negativo, neutral).
+
+Intentamos con Stanza pero el prcoesamiento de los 13600 comentarios tarda 14h.... probamos con Spacy
