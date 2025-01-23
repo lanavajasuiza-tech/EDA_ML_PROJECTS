@@ -381,6 +381,25 @@ print(df[['Lemmatized_Comment', 'Sentiment_Score', 'Sentiment_Category']].head()
 df.to_excel('data/sentiment_analysis_output.xlsx', index=False)
 print("Archivo con análisis de sentimientos exportado con éxito.")
 
+# Combinamos el resultado de sentiment_analysys_output.xlsx con el original de Kaggle para comparar resultados
+
+import pandas as pd
+
+# Leer los archivos
+df1 = pd.read_excel('data/ZooKeeper_Project_Dataset.xlsx')
+df2 = pd.read_excel('data/sentiment_analysis_output.xlsx')
+
+# Ver los nombres de las columnas
+print(df1.columns)
+print(df2.columns)
+
+
+# Concatenar los DataFrames
+df_concatenado = pd.concat([df1, df2], axis=1)
+print(df_concatenado.columns) 
+
+# Guardar el resultado
+df_concatenado.to_excel('data/Análisis_final.xlsx', index=False)
 
 #### VISUALIZAMOS ####
 
@@ -416,4 +435,3 @@ plt.title('Mapa de Calor de Sentimientos por Usuario')
 plt.xlabel('Sentimiento')
 plt.ylabel('Usuario')
 plt.show()
-

@@ -57,4 +57,6 @@ Profundizamos un poco más en el contexto del dataSet:
 * **Análisis temporal detallado** : Ver cómo la actividad en los comentarios cambia con el tiempo, buscando patrones estacionales o picos.
 * **Correlación entre usuarios y sentimientos** : Analizar cómo los comentarios de los usuarios se distribuyen entre los diferentes sentimientos (positivo, negativo, neutral).
 
-Intentamos con Stanza pero el prcoesamiento de los 13600 comentarios tarda 14h.... probamos con Spacy
+Intentamos con Stanza para limpieza y lematización, el proceso completo tarda unas 4h aprox para los 13600 comentarios
+
+Para este ejercicio de examen hemos concluido que finalmente para practicar todo el proceso verificamos que lal información original de kaggle y todos los pasos que hemos realizado van a generar el mismo resultado, añadimos la información de rango de fechas y usuarios más activos como valor añadido al data set
