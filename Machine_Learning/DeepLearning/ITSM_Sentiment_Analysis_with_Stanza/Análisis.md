@@ -60,3 +60,8 @@ Profundizamos un poco más en el contexto del dataSet:
 Intentamos con Stanza para limpieza y lematización, el proceso completo tarda unas 4h aprox para los 13600 comentarios
 
 Para este ejercicio de examen hemos concluido que finalmente para practicar todo el proceso verificamos que lal información original de kaggle y todos los pasos que hemos realizado van a generar el mismo resultado, añadimos la información de rango de fechas y usuarios más activos como valor añadido al data set
+
+
+Tras visualizar el resultado vemos que hay incongruencias entre el sentimienot del dataSet original y el realizado en este ejercicio, hay un sentimiento neutro que coincide en ambos análisis sin embargo se invierte la sensación entre positivo y negativo que require de estudio más profundo y comparar donde puede estar la discrepancia entre ambos análisis
+
+![1737642347777](image/Análisis/1737642347777.png)
