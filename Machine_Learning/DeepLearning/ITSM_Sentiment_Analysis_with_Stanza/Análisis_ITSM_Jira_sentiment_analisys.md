@@ -57,11 +57,50 @@ Profundizamos un poco más en el contexto del dataSet:
 * **Análisis temporal detallado** : Ver cómo la actividad en los comentarios cambia con el tiempo, buscando patrones estacionales o picos.
 * **Correlación entre usuarios y sentimientos** : Analizar cómo los comentarios de los usuarios se distribuyen entre los diferentes sentimientos (positivo, negativo, neutral).
 
-Intentamos con Stanza para limpieza y lematización, el proceso completo tarda unas 4h aprox para los 13600 comentarios
+**Proceso de Limpieza y Lematización:**
 
-Para este ejercicio de examen hemos concluido que finalmente para practicar todo el proceso verificamos que lal información original de kaggle y todos los pasos que hemos realizado van a generar el mismo resultado, añadimos la información de rango de fechas y usuarios más activos como valor añadido al data set
+Inicialmente, intentamos utilizar Stanza para la limpieza y lematización de los comentarios. En un equipo local, el proceso completo tardó aproximadamente 4 horas para procesar los 13,600 comentarios. Sin embargo, cuando ejecutamos el mismo proceso en Google Colab utilizando la GPU, el tiempo de ejecución se redujo significativamente a alrededor de 35 minutos.
 
+**Conclusión y Valor Añadido al Dataset:**
 
-Tras visualizar el resultado vemos que hay incongruencias entre el sentimienot del dataSet original y el realizado en este ejercicio, hay un sentimiento neutro que coincide en ambos análisis sin embargo se invierte la sensación entre positivo y negativo que require de estudio más profundo y comparar donde puede estar la discrepancia entre ambos análisis
+Para este ejercicio de examen, verificamos que, al seguir todos los pasos que realizamos, obtenemos resultados consistentes con los datos originales de Kaggle. Además, como valor añadido al dataset, incorporamos información adicional sobre el rango de fechas y los usuarios más activos.
 
-![1737642347777](image/Análisis/1737642347777.png)
+**Análisis Comparativo:**
+
+Tras visualizar los resultados, observamos algunas incongruencias a primera vista entre el análisis de sentimientos del dataset original y el realizado en este ejercicio. Sin embargo, es importante destacar que no todo es lo que parece. A continuación, desglosaré la información resultante, comparando ambos enfoques para ofrecer una visión más detallada y precisa de los resultados.
+
+![1737720227910](image/Análisis_ITSM_Jira_sentiment_analisys/1737720227910.png)
+
+# **Análisis Comparativo de Sentimientos en Comentarios Técnicos de ITSM (Jira)**
+
+El análisis se centra en comparar dos enfoques utilizados para clasificar los comentarios de usuarios sobre una herramienta de ITSM (Jira):
+
+1. **Análisis de Tono (Polite vs. Unpolite)** :
+
+* El modelo clasifica los comentarios según su  **formalidad y cortesía** .
+* La mayoría de los comentarios son **neutrales** en cuanto al tono, reflejando la naturaleza profesional de la comunicación técnica.
+* Los comentarios **no corteses** son pocos, lo que es esperado en un entorno técnico donde se mantiene un lenguaje formal, aunque pueden existir frustraciones.
+
+1. **Análisis de Sentimiento (Positivo, Negativo, Neutral)** :
+
+* El análisis de sentimiento muestra una prevalencia de comentarios **neutrales** y  **negativos** .
+* Los comentarios negativos son comprensibles en el contexto de ITSM, donde los usuarios a menudo enfrentan problemas o dificultades con la herramienta.
+* La **frustración** puede ser implícita en los comentarios, aunque se mantenga un tono formal.
+
+### **Diferencias en los Enfoques**
+
+* El **análisis de tono** mide la cortesía y la **forma** de los comentarios, mientras que el **análisis de sentimiento** mide las emociones subyacentes como  **insatisfacción o frustración** .
+* Aunque los técnicos tienden a usar un tono  **cortés y profesional** , los sentimientos negativos surgen cuando los comentarios abordan fallos, errores o dificultades con la herramienta.
+
+### **Conclusiones**
+
+* **El análisis de tono** refleja la **formalidad** de los comentarios, mientras que el **análisis de sentimiento** resalta las emociones, especialmente las **negativas** en un contexto de resolución de problemas.
+* La **neutralidad** en los comentarios refleja una comunicación objetiva y técnica, pero los sentimientos negativos son comunes debido a los problemas encontrados en la herramienta.
+
+### **Investigación Futura**
+
+* **Profundizar en las frustraciones técnicas** para entender mejor qué problemas enfrentan los usuarios.
+* **Explorar comentarios positivos** para identificar características o funcionalidades que se valoran bien.
+* **Implementar un modelo automatizado** que pueda clasificar tanto el tono como el sentimiento de manera más precisa.
+
+Este análisis proporciona una base sólida para entender cómo se comunican los técnicos sobre herramientas de ITSM, destacando tanto el tono formal como las emociones subyacentes, y sugiere líneas de investigación futura.

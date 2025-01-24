@@ -393,7 +393,6 @@ df2 = pd.read_excel('data/sentiment_analysis_output.xlsx')
 print(df1.columns)
 print(df2.columns)
 
-
 # Concatenar los DataFrames
 df_concatenado = pd.concat([df1, df2], axis=1)
 print(df_concatenado.columns) 
@@ -401,37 +400,25 @@ print(df_concatenado.columns)
 # Guardar el resultado
 df_concatenado.to_excel('data/Análisis_final.xlsx', index=False)
 
-#### VISUALIZAMOS ####
+#### VISUALIZAMOS RESULTADOS STANZA ####
 
 import matplotlib.pyplot as plt
-
-# Contar las categorías
-sentiment_counts = df['Sentiment_Category'].value_counts()
-
-# Graficar la distribución
-sentiment_counts.plot(kind='bar', color=['red', 'blue', 'green'])
-plt.title('Distribución de Sentimientos')
-plt.xlabel('Categoría de Sentimiento')
-plt.ylabel('Número de Comentarios')
-plt.xticks(rotation=0)
-plt.show()
-
-# Histograma de puntajes de sentimiento
-df['Sentiment_Score'].plot(kind='hist', bins=10, color='skyblue', edgecolor='black')
-plt.title('Distribución de Puntajes de Sentimiento')
-plt.xlabel('Puntaje de Sentimiento')
-plt.ylabel('Frecuencia')
-plt.show()
-
 import seaborn as sns
 
-# Crear una tabla cruzada
-user_sentiment_matrix = pd.crosstab(df['User'], df['Sentiment_Category'])
+# ... (tu código para cargar los datos y crear los DataFrames) ...
 
-# Graficar el mapa de calor
-plt.figure(figsize=(10, 8))
-sns.heatmap(user_sentiment_matrix, annot=True, fmt='d', cmap='coolwarm')
-plt.title('Mapa de Calor de Sentimientos por Usuario')
-plt.xlabel('Sentimiento')
-plt.ylabel('Usuario')
+# Crear una figura con 1 fila y 2 columnas
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 5))
+
+# Gráfico 1: Distribución de Sentimientos
+sentiment_counts = df_concatenado['Sentiment_Category'].value_counts()
+sentiment_counts.plot(kind='bar', color=['green', 'red', 'blue'], ax=axes[0])
+axes[0].set_title('Distribución de Sentimientos')
+
+# Gráfico 2: Histograma de Puntajes de Sentimiento
+sns.histplot(df_concatenado['Sentiment_Score'], bins=20, kde=True, ax=axes[1])
+axes[1].set_title('Distribución de Puntajes de Sentimiento')
+
+# Ajustar el espaciado entre subplots
+plt.tight_layout()
 plt.show()
