@@ -1,4 +1,4 @@
-# EDA and Machine Learning - Practice and Exercises
+# EDA and Machine Learning projects
 
 Welcome to my repository of **Exploratory Data Analysis (EDA)** and **Machine Learning** exercises!
 
